@@ -1,3 +1,4 @@
+using Kata.Rules;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -78,16 +79,54 @@ namespace Kata.Test
 
         [Fact]
         public void Total_With_Applied_Offers()
-        {          
-            var rule = new QuantityForSpecialOffer("B15", "2 for less", 2, 0.45m);
+        {
+            var expected = 0.45m;
 
-            var checkout = new Checkout(new List<IPriceRule> { rule });
+            var rule = new QuantityForOffer("B15", "2 for less", 2, 0.45m);
+
+            var checkout = new Checkout(new List<IOffer> { rule });
             checkout.Scan(itemB15);            
             checkout.Scan(itemB15);
 
             var total = checkout.Total();
 
-            Assert.Equal(rule.OfferPrice, total);
+            Assert.Equal(expected, total);
+        }
+
+        [Fact]
+        public void Total_With_Applied_Offers_Multiple_Times()
+        {
+            var rule = new QuantityForOffer("B15", "2 for less", 2, 0.45m);
+
+            var expected = rule.OfferPrice * 2m;
+
+            var checkout = new Checkout(new List<IOffer> { rule });
+            checkout.Scan(itemB15);
+            checkout.Scan(itemB15);
+            checkout.Scan(itemB15);
+            checkout.Scan(itemB15);
+
+            var total = checkout.Total();
+
+            Assert.Equal(expected, total);
+        }
+
+        [Fact]
+        public void Total_All_Items_With_Applied_Offers()
+        {
+            var expected = 0.45m + 0.50m + 0.60m;
+
+            var rule = new QuantityForOffer("B15", "2 for less", 2, 0.45m);
+            var checkout = new Checkout(new List<IOffer> { rule });
+
+            checkout.Scan(itemA99);
+            checkout.Scan(itemB15);
+            checkout.Scan(itemC40);
+            checkout.Scan(itemB15);
+
+            var total = checkout.Total();
+
+            Assert.Equal(expected, total);
         }
     }
 }

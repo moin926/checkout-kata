@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Kata.Rules;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,20 +10,42 @@ namespace Kata
     {
         public List<Item> SKUs { get; }
 
-        public List<IPriceRule> PriceRules { get; }
+        public List<IOffer> Offers { get; }
 
-        public List<PriceRuleResult> AppliedRules { get; }
+        public List<OfferResult> AppliedOffers { get; }
 
-        public Checkout(List<IPriceRule> rules)
+        public Checkout(List<IOffer> rules)
         {
             SKUs = new List<Item>();            
-            AppliedRules = new List<PriceRuleResult>();
-            PriceRules = rules ?? new List<IPriceRule>();
+            AppliedOffers = new List<OfferResult>();
+            Offers = rules ?? new List<IOffer>();
         }
 
         public decimal Total()
         {
-            return AppliedRules.Sum(i => i.TotalPrice);
+            // Apply totals to offers
+            var total = AppliedOffers.Sum(i => i.TotalPrice);
+
+            return total += NoneQualiyingTotal();
+        }
+
+        private decimal NoneQualiyingTotal()
+        {
+            var total = 0m;
+
+            // Sum and total SKUs that don't qualify for offers
+            var groupedSkus = SKUs.GroupBy(r => r.SKU);
+
+            foreach (var sku in groupedSkus)
+            {
+                var skusRuleAppliedQty = AppliedOffers.Where(r => r.SKU == sku.Key).Sum(r => r.Quantity);
+                var skuScannedQty = SKUs.Count(s => s.SKU == sku.Key);
+
+                if (skuScannedQty > skusRuleAppliedQty)
+                    total += sku.First().UnitPrice * (skuScannedQty - skusRuleAppliedQty);
+            }
+
+            return total;
         }
 
         public void Scan(Item item)
@@ -32,19 +55,12 @@ namespace Kata
 
             SKUs.Add(item);
 
-            var applied = PriceRules
+            var applied = Offers
                 .Where(r => r.SKU == item.SKU)
                 .Where(r => r.Apply(item, SKUs))
-                .Select(r => new PriceRuleResult(r.SKU, r.Name, r.Quantity, r.OfferPrice));
+                .Select(r => new OfferResult(r.SKU, r.Name, r.Quantity, r.OfferPrice));
 
-            AppliedRules.AddRange(applied);            
+            AppliedOffers.AddRange(applied);            
         }
     }
-
-
-
-
-
-
-
 }
