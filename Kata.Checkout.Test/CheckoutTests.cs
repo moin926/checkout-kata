@@ -73,6 +73,5 @@ namespace Kata.Test
 
             Assert.Equal(expected, total);
         }
-
     }
 }
