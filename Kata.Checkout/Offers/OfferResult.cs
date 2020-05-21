@@ -1,4 +1,4 @@
-﻿namespace Kata.Rules
+﻿namespace Kata.Offers
 {
     public class OfferResult
     {

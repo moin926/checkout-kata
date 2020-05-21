@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Kata.Rules
+namespace Kata.Offers
 {
     /// <summary>
     /// The IOffer interface allows implementation of various offers with varying complexity.

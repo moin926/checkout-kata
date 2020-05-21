@@ -1,4 +1,4 @@
-﻿using Kata.Rules;
+﻿using Kata.Offers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
