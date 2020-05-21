@@ -48,6 +48,18 @@ namespace Kata.Test
         }
 
         [Fact]
+        public void Zero_Total_For_No_Scanned_Items()
+        {
+            var expected = 0m;
+
+            var checkout = new Checkout();
+
+            var total = checkout.Total();
+
+            Assert.Equal(expected, total);
+        }
+
+        [Fact]
         public void Total_From_Scanned_Items()
         {
             var expected = 0.50m + 0.30m + 0.60m;
