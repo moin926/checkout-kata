@@ -12,6 +12,9 @@ namespace Kata
 
         public List<IOffer> Offers { get; }
 
+        /// <summary>
+        /// Idividual SKUs can have multiple offers
+        /// </summary>
         public List<OfferResult> AppliedOffers { get; }
 
         public Checkout(List<IOffer> rules)
