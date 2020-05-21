@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Kata.Test
@@ -25,26 +26,42 @@ namespace Kata.Test
         };
 
         [Fact]
-        public void Scan_Items_Are_Added_To_Collection()
+        public void Scan_Items_Are_Added_To_SKUs()
         {
             var expected = 3;
 
-            var checkout = new Checkout();
+            var checkout = new Checkout(null);
             checkout.Scan(itemA99);
             checkout.Scan(itemB15);
             checkout.Scan(itemC40);
 
-            Assert.Equal(expected, checkout.ScannedItems.Count);
+            Assert.Equal(expected, checkout.SKUs.Count);
         }
 
         [Fact]
         public void Null_Scanned_Item_Throws_ArgumentNullException()
         {
-            var checkout = new Checkout();
-  
+            var checkout = new Checkout(null);
+
             var exception = Assert.Throws<ArgumentNullException>("item", () => checkout.Scan(null));
 
             Assert.NotNull(exception);
+        }
+
+
+        [Fact]
+        public void Total_From_Scanned_Items()
+        {
+            var expected = 0.50m + 0.30m + 0.60m;
+
+            var checkout = new Checkout(null);
+            checkout.Scan(itemA99);
+            checkout.Scan(itemB15);
+            checkout.Scan(itemC40);
+
+            var total = checkout.Total();
+
+            Assert.Equal(expected, total);
         }
 
         [Fact]
@@ -52,7 +69,7 @@ namespace Kata.Test
         {
             var expected = 0m;
 
-            var checkout = new Checkout();
+            var checkout = new Checkout(null);
 
             var total = checkout.Total();
 
@@ -60,18 +77,17 @@ namespace Kata.Test
         }
 
         [Fact]
-        public void Total_From_Scanned_Items()
-        {
-            var expected = 0.50m + 0.30m + 0.60m;
+        public void Total_With_Applied_Offers()
+        {          
+            var rule = new QuantityForSpecialOffer("B15", "2 for less", 2, 0.45m);
 
-            var checkout = new Checkout();
-            checkout.Scan(itemA99);
+            var checkout = new Checkout(new List<IPriceRule> { rule });
+            checkout.Scan(itemB15);            
             checkout.Scan(itemB15);
-            checkout.Scan(itemC40);
 
             var total = checkout.Total();
 
-            Assert.Equal(expected, total);
+            Assert.Equal(rule.OfferPrice, total);
         }
     }
 }

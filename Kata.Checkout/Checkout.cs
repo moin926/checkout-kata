@@ -7,24 +7,44 @@ namespace Kata
 {
     public class Checkout
     {
-        public IList<Item> ScannedItems { get; }
+        public List<Item> SKUs { get; }
 
-        public Checkout()
+        public List<IPriceRule> PriceRules { get; }
+
+        public List<PriceRuleResult> AppliedRules { get; }
+
+        public Checkout(List<IPriceRule> rules)
         {
-            ScannedItems = new List<Item>();
+            SKUs = new List<Item>();            
+            AppliedRules = new List<PriceRuleResult>();
+            PriceRules = rules ?? new List<IPriceRule>();
         }
 
         public decimal Total()
         {
-            return ScannedItems.Sum(i => i.UnitPrice);
+            return AppliedRules.Sum(i => i.TotalPrice);
         }
+
         public void Scan(Item item)
         {
             if (item == null)
                 throw new ArgumentNullException(nameof(item));
 
-            ScannedItems.Add(item);
+            SKUs.Add(item);
+
+            var applied = PriceRules
+                .Where(r => r.SKU == item.SKU)
+                .Where(r => r.Apply(item, SKUs))
+                .Select(r => new PriceRuleResult(r.SKU, r.Name, r.Quantity, r.OfferPrice));
+
+            AppliedRules.AddRange(applied);            
         }
     }
+
+
+
+
+
+
 
 }
