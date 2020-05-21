@@ -2,7 +2,7 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/Kata.Checkout/.vs
+/.vs
 /Kata.Checkout/bin
 /Kata.Checkout/obj
 /Kata.Checkout.Test/bin
